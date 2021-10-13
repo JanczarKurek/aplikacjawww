@@ -54,12 +54,12 @@ class Command(BaseCommand):
                 user.last_name = self.fake.last_name()
                 user.save()
 
-                user.userprofile.gender = profile_data['sex']
                 user.userprofile.school = "TEST"
-                user.userprofile.matura_exam_year = self.fake.date_this_year().year
-                user.userprofile.how_do_you_know_about = self.fake.text()
+                user.userprofile.phone_number = "+48000000000"
+                user.userprofile.invoice = True
+                user.userprofile.invoice_data = self.fake.text()
+
                 user.userprofile.profile_page = self.fake.text()
-                user.userprofile.cover_letter = self.fake.text()
                 user.userprofile.save()
 
                 self.question_pesel.answers.create(user=user, value_string=profile_data['ssn'])

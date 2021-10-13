@@ -9,9 +9,6 @@
         {% if not has_completed_profile %}
           <span class="badge badge-dark" style="font-size: 50%;">Niekompletny profil</span>
         {% endif %}
-        {% if not has_cover_letter %}
-          <span class="badge badge-dark" style="font-size: 50%;">Brak listu motywacyjnego</span>
-        {% endif %}
       {% endif %}
     </h2>
     {% if not current_status %}
@@ -19,7 +16,7 @@
         Nie {% if current_status.status == 'Z' %}zgłosiłaś{% else %}zgłosiłeś{% endif %} się na żadne warsztaty.
         Przejdź do zakładki <a href="{% url 'program' current_year.pk %}">Program</a>,
         zapisz się na interesujące Cię tematy i rozwiąż na nie zadania kwalifikacyjne. Wypełnij także swój
-        <a href="{% url 'mydata_profile' %}">profil</a> i <a href="{% url 'mydata_cover_letter' %}">list motywacyjny</a>.
+        <a href="{% url 'mydata_profile' %}">profil</a>.
       </p>
       {% if current_year.are_proposals_open %}
       <p>
@@ -42,11 +39,7 @@
       {% else %}
         {% if current_status.status == 'Z' %}
           <p>
-            {% if gender == 'F' %}
-              Zostałaś zakwalifikowana na warsztaty. Czekaj na dalsze informacje.
-            {% else %}
-              Zostałeś zakwalifikowany na warsztaty. Czekaj na dalsze informacje.
-            {% endif %}
+            Zostałeś zakwalifikowany na warsztaty. Czekaj na dalsze informacje.
           </p>
         {% elif current_status.status == 'O' %}
           <p>
@@ -54,29 +47,17 @@
           </p>
         {% elif current_status.status == 'X' %}
           <p>
-            {% if gender == 'F' %}
-              Zostałaś zakwalifikowana na warsztaty, ale odwołałaś swój przyjazd.
-            {% else %}
-              Zostałeś zakwalifikowany na warsztaty, ale odwołałeś swój przyjazd.
-            {% endif %}
+            Zostałeś zakwalifikowany na warsztaty, ale odwołałeś swój przyjazd.
           </p>
         {% elif not current_status.status %}
-          {% if not has_completed_profile or not has_cover_letter %}
+          {% if not has_completed_profile %}
             <p>
-                {% if gender == 'F' %}
-                  Zapisałaś się na warsztaty, ale nie wypełniłaś wymaganych danych.
-                {% else %}
-                  Zapisałeś się na warsztaty, ale nie wypełniłeś wymaganych danych.
-                {% endif %}
-                Uzupełnij swój <a href="{% url 'mydata_profile' %}">profil</a> i <a href="{% url 'mydata_cover_letter' %}">list motywacyjny</a>.
+                Zapisałeś się na warsztaty, ale nie wypełniłeś wymaganych danych.
+                Uzupełnij swój <a href="{% url 'mydata_profile' %}">profil</a>.
             </p>
           {% else %}
             <p>
-              {% if gender == 'F' %}
-                Zgłosiłaś się na warsztaty.
-              {% else %}
-                Zgłosiłeś się na warsztaty.
-              {% endif %}
+              Zgłosiłeś się na warsztaty.
               Rozwiąż zadania kwalifikacyjne na wybrane przez Ciebie warsztaty, i czekaj na wyniki.
             </p>
           {% endif %}

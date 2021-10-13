@@ -54,22 +54,22 @@ class UserProfilePageForm(ModelForm):
         widgets = {'profile_page': InitializedTinyMCE()}
 
 
-class UserCoverLetterForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(UserCoverLetterForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper(self)
-        self.helper.include_media = False
-        self.helper.layout.fields.append(FormActions(
-            HTML('<a role="button" class="btn btn-outline-dark btn-sm mx-1 my-3" href="{% url "profile" user.id %}" target="_blank" title="Otwiera się w nowej karcie">Podgląd twojego profilu</a>'),
-            StrictButton('Zapisz', type='submit', css_class='btn-outline-primary btn-lg mx-1 my-3'),
-            css_class='text-right'
-        ))
+# class UserCoverLetterForm(ModelForm):
+#     def __init__(self, *args, **kwargs):
+#         super(UserCoverLetterForm, self).__init__(*args, **kwargs)
+#         self.helper = FormHelper(self)
+#         self.helper.include_media = False
+#         self.helper.layout.fields.append(FormActions(
+#             HTML('<a role="button" class="btn btn-outline-dark btn-sm mx-1 my-3" href="{% url "profile" user.id %}" target="_blank" title="Otwiera się w nowej karcie">Podgląd twojego profilu</a>'),
+#             StrictButton('Zapisz', type='submit', css_class='btn-outline-primary btn-lg mx-1 my-3'),
+#             css_class='text-right'
+#         ))
 
-    class Meta:
-        model = UserProfile
-        fields = ['cover_letter']
-        labels = {'cover_letter': "List motywacyjny"}
-        widgets = {'cover_letter': InitializedTinyMCE()}
+#     class Meta:
+#         model = UserProfile
+#         fields = ['speech_abstract']
+#         labels = {'speech_abstract': "Abstrakt"}
+#         widgets = {'speech_abstract': InitializedTinyMCE()}
 
 
 class UserProfileForm(ModelForm):
@@ -90,12 +90,11 @@ class UserProfileForm(ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ['gender', 'school', 'matura_exam_year', 'how_do_you_know_about']
+        fields = [ 'phone_number', 'school','invoice']
         labels = {
-            'gender': 'Płeć',
-            'school': 'Szkoła lub uniwersytet',
-            'matura_exam_year': 'Rok zdania matury',
-            'how_do_you_know_about': 'Skąd wiesz o WWW?',
+            'school': 'Uniwersytet',
+            'invoice': 'Faktura',
+            'phone_number': 'Numer telefonu'
         }
 
 

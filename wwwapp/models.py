@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError, SuspiciousOperation
 from django.core.files.storage import FileSystemStorage
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
+from django.db.models.enums import Choices
 from django.db.models.query_utils import Q
 from django.db.models.signals import post_save, pre_save, pre_delete
 from django.dispatch.dispatcher import receiver
@@ -99,16 +100,21 @@ def protect_last_camp(sender, instance, using, **kwargs):
         raise ValidationError('At least one Camp object must exist')
 
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    gender = models.CharField(max_length=10, choices=[('M', 'Mężczyzna'), ('F', 'Kobieta'),],
-                              null=True, default=None, blank=True)
+class UserProfile(models.Model):
+    class BoolChoices(models.TextChoices):
+        NO = 0, 'NIE'
+        YES = 1, 'TAK'
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     school = models.CharField(max_length=100, default="", blank=True)
-    matura_exam_year = models.PositiveSmallIntegerField(null=True, default=None, blank=True)
-    how_do_you_know_about = models.CharField(max_length=1000, default="", blank=True)
     profile_page = models.TextField(max_length=100000, blank=True, default="")
-    cover_letter = models.TextField(max_length=100000, blank=True, default="")
+    invoice = models.CharField(choices=BoolChoices.choices, default=BoolChoices.NO, max_length=3, blank=True)
+    invoice_data = models.TextField(max_length=200, default="", blank=True)
+    phone_number = models.CharField(max_length=20, default="", blank=True)
+
+    def wants_invoice(self) -> bool:
+        return self.invoice == 'TAK'
 
     def is_participating_in(self, year: Camp) -> bool:
         return self.is_participant_in(year) or self.is_lecturer_in(year)
@@ -200,14 +206,14 @@ class UserProfile(models.Model):
     @property
     def is_completed(self) -> bool:
         """
-        Check if all required info (except cover letter and profile page) is filled in
+        Check if all required info (except profile page) is filled in
         """
-        return bool(self.gender) and \
-               bool(self.school) and \
-               bool(self.matura_exam_year) and \
+        return bool(self.school) and \
                bool(self.user.first_name) and \
                bool(self.user.last_name) and \
-               bool(self.user.email)
+               bool(self.user.email) and \
+               bool(self.invoice) and \
+               bool(self.phone_number)        
 
     def __str__(self):
         return "{0.first_name} {0.last_name}".format(self.user)

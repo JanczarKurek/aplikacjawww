@@ -25,8 +25,6 @@ class TestBasicViews(TestCase):
             username='participant', email='participant@example.com', password='user123')
 
         self.participant_user.userprofile.profile_page = '<p>O mnie</p>'
-        self.participant_user.userprofile.cover_letter = '<p>Jestem fajny</p>'
-        self.participant_user.userprofile.how_do_you_know_about = 'nie wiem'
         self.participant_user.userprofile.save()
 
         self.workshop_type = WorkshopType.objects.create(year=self.year_2020, name='This type')

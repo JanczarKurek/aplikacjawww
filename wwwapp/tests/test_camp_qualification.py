@@ -27,8 +27,6 @@ class CampQualificationViews(TestCase):
             username='participant', email='participant@example.com', password='user123')
 
         self.participant_user.userprofile.profile_page = '<p>O mnie</p>'
-        self.participant_user.userprofile.cover_letter = '<p>Jestem fajny</p>'
-        self.participant_user.userprofile.how_do_you_know_about = 'nie wiem'
         self.participant_user.userprofile.save()
 
         WorkshopType.objects.create(year=self.year_2019, name='Not this type')
@@ -137,10 +135,9 @@ class CampQualificationViews(TestCase):
             'first_name': 'Użytkownik',
             'last_name': 'Testowy',
             'email': 'test@example.com',
-            'gender': 'M',
             'school': 'Internet WWW',
-            'matura_exam_year': 2038,
-            'how_do_you_know_about': 'GitHub',
+            'invoice' : True,
+            'phone_number' : '+48000000000',
         })
         self.assertRedirects(response, reverse('login') + '?next=' + reverse('mydata_profile'))
 
@@ -152,13 +149,6 @@ class CampQualificationViews(TestCase):
         })
         self.assertRedirects(response, reverse('login') + '?next=' + reverse('mydata_profile_page'))
 
-        response = self.client.get(reverse('mydata_cover_letter'))
-        self.assertRedirects(response, reverse('login') + '?next=' + reverse('mydata_cover_letter'))
-
-        response = self.client.post(reverse('mydata_cover_letter'), {
-            'cover_letter': '<p>mój list</p>',
-        })
-        self.assertRedirects(response, reverse('login') + '?next=' + reverse('mydata_cover_letter'))
 
     def test_edit_profile(self):
         self.client.force_login(self.participant_user)
@@ -167,10 +157,9 @@ class CampQualificationViews(TestCase):
             'first_name': 'Użytkownik',
             'last_name': 'Testowy',
             'email': 'test@example.com',
-            'gender': 'M',
             'school': 'Internet WWW',
-            'matura_exam_year': 2038,
-            'how_do_you_know_about': 'GitHub',
+            'invoice' : True,
+            'phone_number' : '+48000000000',
         })
         self.assertRedirects(response, reverse('mydata_profile'))
         messages = get_messages(response.wsgi_request)
@@ -185,10 +174,6 @@ class CampQualificationViews(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(list(messages)[0].message, 'Zapisano.')
 
-        response = self.client.post(reverse('mydata_cover_letter'), {
-            'cover_letter': '<p>mój list</p>',
-        })
-        self.assertRedirects(response, reverse('mydata_cover_letter'))
         messages = get_messages(response.wsgi_request)
         self.assertEqual(len(messages), 1)
         self.assertEqual(list(messages)[0].message, 'Zapisano.')
@@ -198,12 +183,8 @@ class CampQualificationViews(TestCase):
         self.assertEqual(self.participant_user.first_name, 'Użytkownik')
         self.assertEqual(self.participant_user.last_name, 'Testowy')
         self.assertEqual(self.participant_user.email, 'test@example.com')
-        self.assertEqual(self.participant_user.userprofile.gender, 'M')
         self.assertEqual(self.participant_user.userprofile.school, 'Internet WWW')
-        self.assertEqual(self.participant_user.userprofile.matura_exam_year, 2038)
-        self.assertEqual(self.participant_user.userprofile.how_do_you_know_about, 'GitHub')
         self.assertHTMLEqual(self.participant_user.userprofile.profile_page, '<p>mój profil</p>')
-        self.assertHTMLEqual(self.participant_user.userprofile.cover_letter, '<p>mój list</p>')
 
     def test_unauthed_cannot_set_status(self):
         with mock.patch('wwwapp.models.WorkshopUserProfile.save', autospec=True, side_effect=WorkshopUserProfile.save) as save:
