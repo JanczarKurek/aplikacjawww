@@ -69,7 +69,8 @@ urlpatterns = [
     path('', views.index_view, name='index'),
     path('contact_information/', views.contact_information_view, name='contact_information'),
     path('news/', views.news_view, name='news'),
-    path('post/<slug:name>/edit/', views.news_post_edit_view, name='post_edit'),
+    path('post/<str:name>/edit/', views.news_post_edit_view, name='post_edit'),
+    path('post/<str:name>/delete/', views.news_post_delete_view, name='post_delete'),
     path('post/edit/', views.news_post_edit_view, name='post_edit'),    
 ]
 

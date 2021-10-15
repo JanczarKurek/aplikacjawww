@@ -1037,10 +1037,16 @@ def news_view(request):
 
     can_edit_post = request.user.has_perm('wwwapp.change_article')
     title = 'Aktualności'
-    posts = NewsPost.objects.all()
+    posts = NewsPost.objects.all().order_by('date_posted').reverse()
+
+    bleach_args = get_bleach_default_options().copy()
+    # article_content_clean = mark_safe(bleach.clean(art.content, **bleach_args))
+
+    for post in posts:
+        post.content = mark_safe(bleach.clean(post.content, **bleach_args))
     
     context['title'] = title
-    context['posts'] = posts.order_by('date_posted').reverse()
+    context['posts'] = posts
     context['can_edit'] = can_edit_post
     return render(request, 'news.html', context)
 
@@ -1062,6 +1068,10 @@ def news_post_edit_view(request, name=None):
 
     if request.method == 'POST':
         form = NewsPostForm(request.user, request.POST, instance=post)
+        if request.POST.get('delete'):
+            print("IM GONNA DELETE THIS")
+            NewsPost.objects.filter(name=name).delete()
+            return redirect('news')
         if form.is_valid():
             news_post = form.save(commit=False)
             news_post.author = request.user
@@ -1078,6 +1088,13 @@ def news_post_edit_view(request, name=None):
     context['form'] = form
 
     return render(request, 'postedit.html', context)
+
+
+@login_required()
+def news_post_delete_view(request, name=None):
+    if request.method == 'DELETE':
+        print(request)
+    return redirect('news')
 
 
 contact_information_view = as_article("directions")
