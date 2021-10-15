@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from crispy_forms.bootstrap import FormActions, StrictButton, PrependedAppendedText, Alert, AppendedText
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Div, HTML, Field
+from crispy_forms.layout import Layout, Fieldset, Div, HTML, Field, Button, Submit
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
@@ -545,12 +545,14 @@ class NewsPostForm(ModelForm):
         super(ModelForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.include_media = False
+        self.fields['content'].widget = InitializedTinyMCE()
 
         layout = []
         layout.append('title')
         layout.append('content')
         layout.append(FormActions(
-            StrictButton('Zapisz', type='submit', css_class='btn-outline-primary btn-lg mx-1 my-3'),
+            Submit('submit', 'Zapisz'),
+            Submit('delete', 'Usuń'),
             css_class='text-right',
         ))
         self.helper.layout = Layout(*layout)

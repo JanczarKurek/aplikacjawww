@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError, SuspiciousOperation
 from django.core.files.storage import FileSystemStorage
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 from django.db.models.query_utils import Q
 from django.db.models.signals import post_save, pre_save, pre_delete
@@ -600,8 +600,9 @@ class ResourceYearPermission(models.Model):
         permissions = [('access_all_resources', 'Access all resources'), ]
         ordering = ['year', 'display_name']
 
+
 class NewsPost(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, validators=[RegexValidator('([A-Z][a-z] [0-9])+')])
     content = models.TextField()
     date_posted = models.DateTimeField(default=timezone.now())
     author = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL)
