@@ -37,8 +37,8 @@ from django_bleach.utils import get_bleach_default_options
 from django_sendfile import sendfile
 
 from wwwforms.models import Form, FormQuestionAnswer, FormQuestion, pesel_extract_date
-from .forms import ArticleForm, NewsPostForm, UserProfileForm, UserForm, \
-    UserProfilePageForm, WorkshopForm, UserCoverLetterForm, WorkshopParticipantPointsForm, \
+from .forms import ArticleForm, NewsPostForm, SignUpForm, UserProfileForm, UserForm, \
+    UserProfilePageForm, WorkshopForm, WorkshopParticipantPointsForm, \
     TinyMCEUpload, SolutionFileFormSet, SolutionForm, SignUpForm
 from .models import Article, UserProfile, Workshop, WorkshopParticipant, \
     WorkshopUserProfile, ResourceYearPermission, Camp, Solution, NewsPost
@@ -152,7 +152,6 @@ def profile_view(request, user_id):
     context['title'] = "{0.first_name} {0.last_name}".format(user)
     context['profile_page'] = user.userprofile.profile_page
     context['is_my_profile'] = is_my_profile
-    context['gender'] = user.userprofile.gender
 
     if can_see_all_users or is_my_profile:
         context['profile'] = user.userprofile
@@ -216,23 +215,23 @@ def mydata_profile_page_view(request):
     return render(request, 'mydata_profilepage.html', context)
 
 
-@login_required()
-def mydata_cover_letter_view(request):
-    context = {}
+# @login_required()
+# def mydata_speech_abstract_view(request):
+#     context = {}
 
-    if request.method == "POST":
-        user_cover_letter_form = UserCoverLetterForm(request.POST, instance=request.user.userprofile)
-        if user_cover_letter_form.is_valid():
-            user_cover_letter_form.save()
-            messages.info(request, 'Zapisano.', extra_tags='auto-dismiss')
-            return redirect('mydata_cover_letter')
-    else:
-        user_cover_letter_form = UserCoverLetterForm(instance=request.user.userprofile)
+#     if request.method == "POST":
+#         user_speech_abstract_form = UserCoverLetterForm(request.POST, instance=request.user.userprofile)
+#         if user_speech_abstract_form.is_valid():
+#             user_speech_abstract_form.save()
+#             messages.info(request, 'Zapisano.', extra_tags='auto-dismiss')
+#             return redirect('mydata_speech_abstract')
+#     else:
+#         user_speech_abstract_form = UserCoverLetterForm(instance=request.user.userprofile)
 
-    context['user_cover_letter_form'] = user_cover_letter_form
-    context['title'] = 'Mój profil'
+#     context['user_speech_abstract_form'] = user_speech_abstract_form
+#     context['title'] = 'Mój profil'
 
-    return render(request, 'mydata_coverletter.html', context)
+#     return render(request, 'mydata_coverletter.html', context)
 
 
 @login_required()
@@ -250,9 +249,7 @@ def mydata_status_view(request):
     past_status = list(filter(lambda x: x['year'] != current_year, participation_data))
 
     context['title'] = 'Mój profil'
-    context['gender'] = user_profile.gender
     context['has_completed_profile'] = user_profile.is_completed
-    context['has_cover_letter'] = len(user_profile.cover_letter) >= 50
     context['current_status'] = current_status
     context['past_status'] = past_status
 
@@ -352,7 +349,7 @@ def workshop_edit_view(request, year, name=None):
     if is_lecturer:  # The user is one of the lecturers for this workshop
         if len(request.user.userprofile.profile_page) <= 50:  # The user does not have their profile page filled in
             profile_warnings.append(Template("""
-                    <strong>Nie uzupełnił{% if user.userprofile.gender == 'F' %}aś{% else %}eś{% endif %} swojej
+                    <strong>Nie uzupełniłeś swojej
                     <a target="_blank" href="{% url 'mydata_profile_page' %}">strony profilowej</a>.</strong>
                     Powiedz potencjalnym uczestnikom coś więcej o sobie!
                 """).render(Context({'user': request.user})))
@@ -547,23 +544,18 @@ def participants_view(request, year=None):
 
         people[participant.id] = {
             'user': participant.user,
-            'birth': birth,
-            'is_adult': is_adult,
-            'matura_exam_year': participant.matura_exam_year,
             'workshop_count': 0,
             'solution_count': 0,
             'checked_solution_count': 0,
             'to_be_checked_solution_count': 0,
             'accepted_workshop_count': 0,
             'has_completed_profile': participant.is_completed,
-            'has_cover_letter': bool(participant.cover_letter and len(participant.cover_letter) > 50),
             'status': workshop_profile.status if workshop_profile else None,
             'status_display': workshop_profile.get_status_display if workshop_profile else None,
             'participation_data': participation_data,
             'school': participant.school,
             'points': 0.0,
             'infos': [],
-            'how_do_you_know_about': participant.how_do_you_know_about,
             'form_answers': answers,
         }
 
