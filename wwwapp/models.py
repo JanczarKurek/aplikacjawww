@@ -608,7 +608,7 @@ class ResourceYearPermission(models.Model):
 
 
 class NewsPost(models.Model):
-    title = models.CharField(max_length=100, validators=[RegexValidator('([A-Z][a-z] [0-9])+')])
+    title = models.CharField(max_length=100, validators=[RegexValidator('([a-zA-Z0-9 ])+')])
     content = models.TextField()
     date_posted = models.DateTimeField(default=timezone.now())
     author = models.ForeignKey(User, null=True, default=None, on_delete=models.SET_NULL)
