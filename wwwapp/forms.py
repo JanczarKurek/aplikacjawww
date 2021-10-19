@@ -542,15 +542,15 @@ class NewsPostForm(ModelForm):
 
 
 class SignUpForm(UserCreationForm):
-    username = CharField(widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
-    first_name = CharField(widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
-                           max_length=32, help_text='First name')
-    last_name = CharField(widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
-                          max_length=32, help_text='Last name')
-    email = EmailField(widget=EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
-                       max_length=64, help_text='Enter a valid email address')
-    password1 = CharField(widget=PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
-    password2 = CharField(widget=PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password Again'}))
+    username = CharField(label = 'Nazwa użytkownika', widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Nazwa użytkownika'}))
+    first_name = CharField(label = 'Imię', widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Imię'}),
+                           max_length=32)
+    last_name = CharField(label = 'Nazwisko',widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Nazwisko'}),
+                          max_length=32)
+    email = EmailField(label = 'E-mail',widget=EmailInput(attrs={'class': 'form-control', 'placeholder': 'E-mail'}),
+                       max_length=64)
+    password1 = CharField(label = 'Hasło',widget=PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Hasło'}))
+    password2 = CharField(label = 'Powtórz hasło',widget=PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Hasło'}))
 
     class Meta(UserCreationForm.Meta):
         model = User
