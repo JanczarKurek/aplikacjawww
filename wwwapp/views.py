@@ -11,6 +11,8 @@ import bleach
 from dateutil.relativedelta import relativedelta
 from typing import Dict
 
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm
 from django.db.models.expressions import F
 from django.db.models.query import Prefetch
 
@@ -37,7 +39,7 @@ from django_sendfile import sendfile
 from wwwforms.models import Form, FormQuestionAnswer, FormQuestion, pesel_extract_date
 from .forms import ArticleForm, NewsPostForm, UserProfileForm, UserForm, \
     UserProfilePageForm, WorkshopForm, UserCoverLetterForm, WorkshopParticipantPointsForm, \
-    TinyMCEUpload, SolutionFileFormSet, SolutionForm
+    TinyMCEUpload, SolutionFileFormSet, SolutionForm, SignUpForm
 from .models import Article, UserProfile, Workshop, WorkshopParticipant, \
     WorkshopUserProfile, ResourceYearPermission, Camp, Solution, NewsPost
 from .templatetags.wwwtags import qualified_mark
@@ -1177,3 +1179,18 @@ def workshop_edit_upload_file(request, year, name):
     target_dir = "images/workshops/{}/{}/".format(workshop.year.pk, workshop.name)
 
     return _upload_file(request, target_dir)
+
+
+def signup_user_view(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('index')
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
