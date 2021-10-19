@@ -53,25 +53,6 @@ class UserProfilePageForm(ModelForm):
         labels = {'profile_page': "Strona profilowa"}
         widgets = {'profile_page': InitializedTinyMCE()}
 
-
-# class UserCoverLetterForm(ModelForm):
-#     def __init__(self, *args, **kwargs):
-#         super(UserCoverLetterForm, self).__init__(*args, **kwargs)
-#         self.helper = FormHelper(self)
-#         self.helper.include_media = False
-#         self.helper.layout.fields.append(FormActions(
-#             HTML('<a role="button" class="btn btn-outline-dark btn-sm mx-1 my-3" href="{% url "profile" user.id %}" target="_blank" title="Otwiera się w nowej karcie">Podgląd twojego profilu</a>'),
-#             StrictButton('Zapisz', type='submit', css_class='btn-outline-primary btn-lg mx-1 my-3'),
-#             css_class='text-right'
-#         ))
-
-#     class Meta:
-#         model = UserProfile
-#         fields = ['speech_abstract']
-#         labels = {'speech_abstract': "Abstrakt"}
-#         widgets = {'speech_abstract': InitializedTinyMCE()}
-
-
 class UserProfileForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
