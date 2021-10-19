@@ -4,15 +4,16 @@ from decimal import Decimal
 from crispy_forms.bootstrap import FormActions, StrictButton, PrependedAppendedText, Alert, AppendedText
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Div, HTML, Field, Button, Submit
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.forms import ModelChoiceField, ModelMultipleChoiceField
-from django.forms import ModelForm, FileInput, FileField
+from django.forms import ModelForm, FileInput, FileField, CharField, EmailField
 from django.forms.fields import ImageField, ChoiceField, DateField
 from django.forms.forms import Form
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
-from django.forms.widgets import Textarea, Widget
+from django.forms.widgets import Textarea, Widget, TextInput, EmailInput, PasswordInput
 from django.template import Template, Context
 from django.urls import reverse
 from django.utils.html import format_html
@@ -531,6 +532,7 @@ class MailFilterForm(Form):
     def filter_name(self):
         return self.filter_methods[self.cleaned_data['filter']][1]
 
+
 class NewsPostForm(ModelForm):
 
     class Meta:
@@ -556,3 +558,25 @@ class NewsPostForm(ModelForm):
             css_class='text-right',
         ))
         self.helper.layout = Layout(*layout)
+#
+#
+# class SignupForm(ModelForm):
+#
+#     class Meta:
+#         model = User
+#         fields = ['']
+
+
+class SignUpForm(UserCreationForm):
+    username = CharField(widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
+    first_name = CharField(widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}), max_length=32, help_text='First name')
+    last_name=CharField(widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}), max_length=32, help_text='Last name')
+    email=EmailField(widget=EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}), max_length=64, help_text='Enter a valid email address')
+    password1=CharField(widget=PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
+    password2=CharField(widget=PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password Again'}))
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        # I've tried both of these 'fields' declaration, result is the same
+        # fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', )
+        fields = UserCreationForm.Meta.fields + ('first_name', 'last_name', 'email',)

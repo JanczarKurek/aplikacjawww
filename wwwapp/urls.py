@@ -1,7 +1,7 @@
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.contrib.auth.views import logout_then_login
+from django.contrib.auth.views import logout_then_login, LoginView
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.generic import RedirectView, TemplateView
 from django.conf import settings
@@ -22,7 +22,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('gallery/', include('gallery.urls')),
     path('accounts/logout/', logout_then_login, name='logout'),
-    path('accounts/login/', login_view, name='login'),
+    # path('accounts/login/', login_view, name='login'),
+    path('accounts/signup/', views.signup_user_view, name='signup'),
+    path('accounts/login/', LoginView.as_view(template_name='login.html'), name='login'),
     path('accounts/', include('social_django.urls', namespace='social')),
     path('accounts/verified/', finish_merge_verification, name='finish_merge_verification'),
     path('profile/<int:user_id>/', views.profile_view, name='profile'),
