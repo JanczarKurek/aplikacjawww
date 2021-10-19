@@ -7,16 +7,16 @@
     <div class="content-section text-center" style="margin-bottom: 20px;">
       <form method="POST">
           {% csrf_token %}
-          <fieldset class="form-group login-content">
+          <fieldset class="form-group">
               {{ form|crispy }}
           </fieldset>
-          <div class="form-group login-content">
-              <button class="btn btn-outline-info"  type="submit">Zaloguj</button>
+          <div class="form-group">
+              <button class="btn btn-outline-primary btn-login"  type="submit">Zaloguj</button>
           </div>
       </form>
-      <div class="border-top pt-3 login-content">
+      <div class="border-top pt-3 ">
           <small class="text-muted">
-              Nie masz jeszcze konta? 
+              Nie masz jeszcze konta?
               <a class="ml-2" href="{% url 'signup' %}">Zarejestruj się.</a>
           </small>
       </div>

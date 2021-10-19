@@ -142,7 +142,6 @@ body {
 // Make the main section below navbar without the scrolling and under it when on scroll
 main {
   margin-top: 0px;
-  padding-top: 20px;
   z-index: 1;
   background: $primary-main;
   min-height: 100vh;
@@ -335,11 +334,15 @@ nav.year-navigation .page-item {
 }
 
 /* Login and register*/
-.content-section {
-  margin: auto;
-  padding: auto;
-  display: inline;
+.btn-login {
+  width: 100%;
 }
+.content-section {
+  display: block;
+  margin: auto;
+  width: 50%;
+}
+
 /*User profile*/
 .asteriskField {
   display: none;
