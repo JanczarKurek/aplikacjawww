@@ -121,15 +121,6 @@
           </ul>
         {% endif %}
 
-        {% if profile %}
-
-          {% if profile_page %}
-            <hr />
-            <h3>Strona profilowa</h3>
-          {% endif %}
-        {% endif %}
-
-        {{ profile_page | bleach }}
         <hr />
 
         {% if is_my_profile %}

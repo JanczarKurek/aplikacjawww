@@ -26,7 +26,6 @@ class CampQualificationViews(TestCase):
         self.participant_user = User.objects.create_user(
             username='participant', email='participant@example.com', password='user123')
 
-        self.participant_user.userprofile.profile_page = '<p>O mnie</p>'
         self.participant_user.userprofile.save()
 
         WorkshopType.objects.create(year=self.year_2019, name='Not this type')
@@ -95,37 +94,6 @@ class CampQualificationViews(TestCase):
         participant.save()
         self.assertEqual(participant.result_in_percent(), 0.0)
 
-    def test_profile_page_unauthenticated(self):
-        # Unauthed users see only the profile page
-        response = self.client.get(reverse('profile', args=[self.participant_user.pk]))
-        self.assertContains(response, 'O mnie')
-        self.assertNotContains(response, 'Jestem fajny')
-        self.assertNotContains(response, 'nie wiem')
-
-    def test_profile_page_self(self):
-        # You see everything on your own profile page
-        self.client.force_login(self.participant_user)
-        response = self.client.get(reverse('profile', args=[self.participant_user.pk]))
-        self.assertContains(response, 'O mnie')
-        self.assertContains(response, 'Jestem fajny')
-        self.assertContains(response, 'nie wiem')
-
-    def test_profile_page_admin(self):
-        # Admins see everything on your own profile page
-        self.client.force_login(self.admin_user)
-        response = self.client.get(reverse('profile', args=[self.participant_user.pk]))
-        self.assertContains(response, 'O mnie')
-        self.assertContains(response, 'Jestem fajny')
-        self.assertContains(response, 'nie wiem')
-
-    def test_profile_page_other(self):
-        # Others see only your profile page
-        self.client.force_login(self.lecturer_user)
-        response = self.client.get(reverse('profile', args=[self.participant_user.pk]))
-        self.assertContains(response, 'O mnie')
-        self.assertNotContains(response, 'Jestem fajny')
-        self.assertNotContains(response, 'nie wiem')
-
     def test_edit_profile_unauthed(self):
         # Trying to edit the profile unauthed redirects to login page
         response = self.client.get(reverse('mydata_profile'))
@@ -140,14 +108,6 @@ class CampQualificationViews(TestCase):
             'phone_number' : '+48000000000',
         })
         self.assertRedirects(response, reverse('login') + '?next=' + reverse('mydata_profile'))
-
-        response = self.client.get(reverse('mydata_profile_page'))
-        self.assertRedirects(response, reverse('login') + '?next=' + reverse('mydata_profile_page'))
-
-        response = self.client.post(reverse('mydata_profile_page'), {
-            'profile_page': '<p>mój profil</p>',
-        })
-        self.assertRedirects(response, reverse('login') + '?next=' + reverse('mydata_profile_page'))
 
 
     def test_edit_profile(self):
@@ -166,10 +126,6 @@ class CampQualificationViews(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(list(messages)[0].message, 'Zapisano.')
 
-        response = self.client.post(reverse('mydata_profile_page'), {
-            'profile_page': '<p>mój profil</p>',
-        })
-        self.assertRedirects(response, reverse('mydata_profile_page'))
         messages = get_messages(response.wsgi_request)
         self.assertEqual(len(messages), 1)
         self.assertEqual(list(messages)[0].message, 'Zapisano.')
@@ -184,7 +140,6 @@ class CampQualificationViews(TestCase):
         self.assertEqual(self.participant_user.last_name, 'Testowy')
         self.assertEqual(self.participant_user.email, 'test@example.com')
         self.assertEqual(self.participant_user.userprofile.school, 'Internet WWW')
-        self.assertHTMLEqual(self.participant_user.userprofile.profile_page, '<p>mój profil</p>')
 
     def test_unauthed_cannot_set_status(self):
         with mock.patch('wwwapp.models.WorkshopUserProfile.save', autospec=True, side_effect=WorkshopUserProfile.save) as save:

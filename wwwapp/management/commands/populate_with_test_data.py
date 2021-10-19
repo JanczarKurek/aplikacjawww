@@ -59,7 +59,6 @@ class Command(BaseCommand):
                 user.userprofile.invoice = True
                 user.userprofile.invoice_data = self.fake.text()
 
-                user.userprofile.profile_page = self.fake.text()
                 user.userprofile.save()
 
                 self.question_pesel.answers.create(user=user, value_string=profile_data['ssn'])

@@ -108,7 +108,6 @@ class UserProfile(models.Model):
     
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     school = models.CharField(max_length=100, default="", blank=True)
-    profile_page = models.TextField(max_length=100000, blank=True, default="")
     invoice = models.CharField(choices=BoolChoices.choices, default=BoolChoices.NO, max_length=3, blank=True)
     invoice_data = models.TextField(max_length=200, default="", blank=True)
     phone_number = models.CharField(max_length=20, default="", blank=True)

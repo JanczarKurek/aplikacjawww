@@ -24,7 +24,6 @@ class TestBasicViews(TestCase):
         self.participant_user = User.objects.create_user(
             username='participant', email='participant@example.com', password='user123')
 
-        self.participant_user.userprofile.profile_page = '<p>O mnie</p>'
         self.participant_user.userprofile.save()
 
         self.workshop_type = WorkshopType.objects.create(year=self.year_2020, name='This type')
