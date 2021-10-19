@@ -43,7 +43,7 @@ from django_sendfile import sendfile
 
 from wwwforms.models import Form, FormQuestionAnswer, FormQuestion, pesel_extract_date
 from .forms import ArticleForm, NewsPostForm, SignUpForm, UserProfileForm, UserForm, \
-    UserProfilePageForm, WorkshopForm, WorkshopParticipantPointsForm, \
+    WorkshopForm, WorkshopParticipantPointsForm, \
     TinyMCEUpload, SolutionFileFormSet, SolutionForm, SignUpForm, AuthenticationWithoutActivation
 from .models import Article, UserProfile, Workshop, WorkshopParticipant, \
     WorkshopUserProfile, ResourceYearPermission, Camp, Solution, NewsPost
@@ -156,7 +156,6 @@ def profile_view(request, user_id):
         return redirect('profile', user.pk)
 
     context['title'] = "{0.first_name} {0.last_name}".format(user)
-    context['profile_page'] = user.userprofile.profile_page
     context['is_my_profile'] = is_my_profile
 
     if can_see_all_users or is_my_profile:
@@ -200,25 +199,6 @@ def mydata_profile_view(request):
     context['title'] = 'Mój profil'
 
     return render(request, 'mydata_profile.html', context)
-
-
-@login_required()
-def mydata_profile_page_view(request):
-    context = {}
-
-    if request.method == "POST":
-        user_profile_page_form = UserProfilePageForm(request.POST, instance=request.user.userprofile)
-        if user_profile_page_form.is_valid():
-            user_profile_page_form.save()
-            messages.info(request, 'Zapisano.', extra_tags='auto-dismiss')
-            return redirect('mydata_profile_page')
-    else:
-        user_profile_page_form = UserProfilePageForm(instance=request.user.userprofile)
-
-    context['user_profile_page_form'] = user_profile_page_form
-    context['title'] = 'Mój profil'
-
-    return render(request, 'mydata_profilepage.html', context)
 
 
 # @login_required()
@@ -352,13 +332,6 @@ def workshop_edit_view(request, year, name=None):
     workshop_url[0:1] = workshop_url[0].split('9999')
 
     profile_warnings = []
-    if is_lecturer:  # The user is one of the lecturers for this workshop
-        if len(request.user.userprofile.profile_page) <= 50:  # The user does not have their profile page filled in
-            profile_warnings.append(Template("""
-                    <strong>Nie uzupełniłeś swojej
-                    <a target="_blank" href="{% url 'mydata_profile_page' %}">strony profilowej</a>.</strong>
-                    Powiedz potencjalnym uczestnikom coś więcej o sobie!
-                """).render(Context({'user': request.user})))
 
     if workshop or has_perm_to_edit:
         workshop_template = Article.objects.get(
