@@ -1,0 +1,5 @@
+{% autoescape off %}
+Hi {{ user.username }}, you managed to successfully registered for our event, congrats UwU ~!
+    Try to log in to activate ur account nya~! You can do this by clicking on
+    http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+{% endautoescape %}

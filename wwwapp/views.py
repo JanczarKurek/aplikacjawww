@@ -13,6 +13,8 @@ from typing import Dict
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail.message import EmailMessage
 from django.db.models.expressions import F
 from django.db.models.query import Prefetch
 
@@ -20,7 +22,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
-from django.contrib.auth.views import redirect_to_login
+from django.contrib.auth.views import redirect_to_login, LoginView
 from django.core.exceptions import SuspiciousOperation
 from django.db import OperationalError, ProgrammingError
 from django.db.models import Q
@@ -28,8 +30,11 @@ from django.http import JsonResponse, HttpResponse, HttpRequest, HttpResponseFor
 from django.http.response import HttpResponseBadRequest, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import Template, Context
+from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.encoding import force_bytes, force_text
 from django.utils.html import format_html
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -39,10 +44,11 @@ from django_sendfile import sendfile
 from wwwforms.models import Form, FormQuestionAnswer, FormQuestion, pesel_extract_date
 from .forms import ArticleForm, NewsPostForm, SignUpForm, UserProfileForm, UserForm, \
     UserProfilePageForm, WorkshopForm, WorkshopParticipantPointsForm, \
-    TinyMCEUpload, SolutionFileFormSet, SolutionForm, SignUpForm
+    TinyMCEUpload, SolutionFileFormSet, SolutionForm, SignUpForm, AuthenticationWithoutActivation
 from .models import Article, UserProfile, Workshop, WorkshopParticipant, \
     WorkshopUserProfile, ResourceYearPermission, Camp, Solution, NewsPost
 from .templatetags.wwwtags import qualified_mark
+import wwwapp.tokens as tokens
 
 
 def get_context(request):
@@ -1173,6 +1179,39 @@ def workshop_edit_upload_file(request, year, name):
     return _upload_file(request, target_dir)
 
 
+def activate(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and tokens.account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        return redirect('index')
+        # return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+    else:
+        return HttpResponse('Activation link is invalid!')
+
+
+def _send_activation_email(current_site, user):
+    token = tokens.account_activation_token.make_token(user)
+    mail_subject = 'Aktywuj konto'
+    message = render_to_string('registration_mail.html', {
+        'user': user,
+        'domain': current_site.domain,
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': token,
+    })
+    # to_email = form.cleaned_data.get('email')
+    to_email = user.email
+    email = EmailMessage(
+        mail_subject, message, to=[to_email]
+    )
+    email.send()
+
+
 def signup_user_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -1181,8 +1220,43 @@ def signup_user_view(request):
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
-            login(request, user)
+            user.is_active = False
+            user.save()
+            _send_activation_email(get_current_site(request), user)
+
             return redirect('index')
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
+
+
+def inactive_user_view(request):
+    user = User.objects.get(pk=request.session['user'])
+    if request.method == "GET":
+        return render(request, 'inactive_user.html', context={"user": user})
+    if request.method == "POST":
+        _send_activation_email(get_current_site(request), user)
+        return redirect('index')
+
+
+class LoginViewWithActivation(LoginView):
+    form_class = AuthenticationWithoutActivation
+
+    # def dispatch(self, request, *args, **kwargs):
+    #     print(request, args, kwargs)
+    #     return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests: instantiate a form instance with the passed
+        POST variables and then check if it's valid.
+        """
+        form = self.get_form()
+        if form.is_valid():
+            user = form.get_user()
+            if not user.is_active:
+                request.session['user'] = user.pk
+                return redirect('inactive_user')
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
