@@ -4,7 +4,8 @@ from decimal import Decimal
 from crispy_forms.bootstrap import FormActions, StrictButton, PrependedAppendedText, Alert, AppendedText
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Div, HTML, Field, Button, Submit
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
@@ -554,3 +555,27 @@ class SignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         fields = UserCreationForm.Meta.fields + ('first_name', 'last_name', 'email',)
+
+
+class AuthenticationWithoutActivation(AuthenticationForm):
+
+    def confirm_login_allowed(self, user):
+        """
+        Do not check activity status of user while validating form
+        we will check it later
+        """
+        pass
+
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        if username is not None and password:
+            self.user_cache = authenticate(self.request, username=username, password=password)
+            print(f"WE HAVE USER {self.user_cache}")
+            if self.user_cache is None:
+                raise self.get_invalid_login_error()
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
