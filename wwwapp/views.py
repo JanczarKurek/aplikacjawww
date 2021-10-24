@@ -1190,7 +1190,6 @@ def activate(request, uidb64, token):
         user.save()
         login(request, user)
         return redirect('index')
-        # return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
     else:
         return HttpResponse('Activation link is invalid!')
 
@@ -1204,7 +1203,6 @@ def _send_activation_email(current_site, user):
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
         'token': token,
     })
-    # to_email = form.cleaned_data.get('email')
     to_email = user.email
     email = EmailMessage(
         mail_subject, message, to=[to_email]
@@ -1241,10 +1239,6 @@ def inactive_user_view(request):
 
 class LoginViewWithActivation(LoginView):
     form_class = AuthenticationWithoutActivation
-
-    # def dispatch(self, request, *args, **kwargs):
-    #     print(request, args, kwargs)
-    #     return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """
