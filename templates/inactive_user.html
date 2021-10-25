@@ -2,14 +2,26 @@
 
 {% load static %}
 {% load wwwtags %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-Drogi użytkowniku {{ user.first_name }} {{ user.last_name }}, twoje konto jest nieaktywne. Możesz je aktywować klikając w link wysłany na adres który podałeś przy rejestracji.<br>
-    Jeśli wiadomośc do ciebie nie dotarła, sprawdź folder ze spamem, lub ponów jej wysłanie używająć
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit">Wyślij ponownie</button>
-    </form>
-    Jeśli pomimo to nie jesteś w stanie się zarejestrować,
-    skontaktuj się z organizatorami drogą mailową.
+<h2 class="heading text-center m-5">Aktywuj konto</h2>
+<section class="border-div">
+    <div>
+        <p>
+            Drogi użytkowniku {{ user.first_name }} {{ user.last_name }}, twoje konto jest nieaktywne. Możesz je aktywować klikając w link wysłany na adres, który podałeś przy rejestracji. 
+            Jeśli wiadomość do ciebie nie dotarła, sprawdź folder ze spamem, lub ponów jej wysłanie.
+        </p>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group login-content">
+                <button class="btn btn-outline-primary  btn-send-again"  type="submit">Wyślij ponownie</button>
+            </div>
+        </form>
+        <small class="text-muted" style="text-align: center;">
+            Jeśli pomimo to nie jesteś w stanie się zarejestrować, skontaktuj się z organizatorami drogą mailową.
+        </small>
+    </div>
+</section>
+
 {% endblock %}
