@@ -342,6 +342,19 @@ nav.year-navigation .page-item {
   margin: auto;
   width: 50%;
 }
+.border-div {
+  border-style: solid;
+  border-width: 2px;
+  border-color: $primary;
+  padding-left: 5%;
+  padding-right: 5%;
+  padding-top: 2.5%;
+  padding-bottom: 2.5%;
+  background: $light;
+}
+.btn-send-again {
+  width: 25%;
+} 
 
 /*User profile*/
 .asteriskField {
